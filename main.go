@@ -70,6 +70,7 @@ func main() {
 
 	r.Get("/api/nextdate", apiNextDate)
 	r.Post("/api/task", apiAddTask)
+	r.Get("/api/tasks", apiGetTasks)
 
 	//r.Get("/tasks", handlers.GetTasks)
 	//r.Post("/tasks", handlers.PostTask)

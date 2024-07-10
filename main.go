@@ -13,6 +13,16 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+type Task struct {
+	ID      string `json:"id"`
+	Date    string `json:"date"`
+	Title   string `json:"title"`
+	Comment string `json:"comment"`
+	Repeat  string `json:"repeat"`
+}
+
+var dbFile string
+
 func main() {
 
 	//fmt.Println(NextDate(time.Now(), "20250701", "y"))
@@ -22,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	dbFile := os.Getenv("TODO_DBFILE")
+	dbFile = os.Getenv("TODO_DBFILE")
 	fmt.Printf("DB on file [%s]\n", dbFile)
 	_, err = os.Stat(dbFile)
 
@@ -59,6 +69,7 @@ func main() {
 	FileServer(r, "/", filesDir)
 
 	r.Get("/api/nextdate", apiNextDate)
+	r.Post("/api/task", apiAddTask)
 
 	//r.Get("/tasks", handlers.GetTasks)
 	//r.Post("/tasks", handlers.PostTask)

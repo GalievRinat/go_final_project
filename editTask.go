@@ -10,6 +10,7 @@ import (
 )
 
 func apiEditTask(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("EditTask")
 	var task Task
 	var buf bytes.Buffer
 
@@ -23,7 +24,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
+	fmt.Println("ID", task.ID)
 	Now := time.Now()
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -89,11 +90,12 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		answer, _ := json.Marshal(map[string]string{"error": "Задача не найдена"})
 		w.Write(answer)
+		return
 	}
 
 	//answer, _ := json.Marshal(Task{})
 	answer := []byte("{}")
-	//fmt.Println("%+s\n", answer)
+	fmt.Println(string(answer))
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(answer)

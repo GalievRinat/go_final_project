@@ -74,6 +74,7 @@ func main() {
 	r.Get("/api/task", apiGetTask)
 	r.Put("/api/task", apiEditTask)
 	r.Post("/api/task/done", apiTaskDone)
+	r.Delete("/api/task", apiTaskDelete)
 
 	//r.Get("/tasks", handlers.GetTasks)
 	//r.Post("/tasks", handlers.PostTask)

@@ -20,8 +20,7 @@ func apiGetTask(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Задача не найдена"})
-		w.Write(answer)
+		w.Write(jsonError("Задача не найдена"))
 		return
 	}
 
@@ -29,8 +28,7 @@ func apiGetTask(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка сериализации JSON"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка сериализации JSON"))
 		return
 	}
 

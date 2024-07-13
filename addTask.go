@@ -30,8 +30,7 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 
 	if task.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка: пустой заголовок"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка: пустой заголовок"))
 		return
 	}
 
@@ -43,8 +42,7 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка: неверный формат даты"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка: неверный формат даты"))
 		return
 	}
 
@@ -55,8 +53,7 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 			task.Date, err = NextDate(Now, task.Date, task.Repeat)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				answer, _ := json.Marshal(map[string]string{"error": "Ошибка даты/повторения"})
-				w.Write(answer)
+				w.Write(jsonError("Ошибка даты/повторения"))
 				return
 			}
 		}
@@ -70,14 +67,17 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка добавления задачи в БД"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка добавления задачи в БД"))
 		return
 	}
 
 	id, _ := res.LastInsertId()
 
-	answer, _ := json.Marshal(map[string]int64{"id": id})
+	answer, err := json.Marshal(map[string]int64{"id": id})
+	if err != nil {
+		fmt.Println("Ошибка генерации JSON для ошибки:", err)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.Write(answer)

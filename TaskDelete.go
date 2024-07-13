@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -21,8 +20,7 @@ func apiTaskDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Задача не найдена:", err)
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Задача не найдена"})
-		w.Write(answer)
+		w.Write(jsonError("Задача не найдена"))
 		return
 	}
 
@@ -30,8 +28,7 @@ func apiTaskDelete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Ошибка удаления:", err)
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка удаления"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка удаления"))
 		return
 	}
 

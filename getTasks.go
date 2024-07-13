@@ -13,8 +13,7 @@ func apiGetTasks(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка чтения из БД"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка чтения из БД"))
 		return
 	}
 	defer rows.Close()
@@ -26,8 +25,7 @@ func apiGetTasks(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println(err)
 			w.WriteHeader(http.StatusBadRequest)
-			answer, _ := json.Marshal(map[string]string{"error": "Ошибка парсинга строк БД"})
-			w.Write(answer)
+			w.Write(jsonError("Ошибка парсинга строк БД"))
 			return
 		}
 
@@ -43,8 +41,7 @@ func apiGetTasks(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка сериализации JSON"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка сериализации JSON"))
 		return
 	}
 

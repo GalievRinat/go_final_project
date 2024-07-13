@@ -31,8 +31,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 
 	if task.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка: пустой заголовок"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка: пустой заголовок"))
 		return
 	}
 
@@ -44,8 +43,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка: неверный формат даты"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка: неверный формат даты"))
 		return
 	}
 
@@ -56,8 +54,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 			task.Date, err = NextDate(Now, task.Date, task.Repeat)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				answer, _ := json.Marshal(map[string]string{"error": "Ошибка даты/повторения"})
-				w.Write(answer)
+				w.Write(jsonError("Ошибка даты/повторения"))
 				return
 			}
 		}
@@ -72,8 +69,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Ошибка обновления задачи в БД:", err)
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Ошибка обновления задачи в БД"})
-		w.Write(answer)
+		w.Write(jsonError("Ошибка обновления задачи в БД"))
 		return
 	}
 
@@ -81,8 +77,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 	if row_count == 0 {
 		fmt.Println("Задача не найдена:", task.ID)
 		w.WriteHeader(http.StatusOK)
-		answer, _ := json.Marshal(map[string]string{"error": "Задача не найдена"})
-		w.Write(answer)
+		w.Write(jsonError("Задача не найдена"))
 		return
 	}
 

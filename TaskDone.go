@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -20,10 +19,9 @@ func apiTaskDone(w http.ResponseWriter, r *http.Request) {
 	var task Task
 	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
 	if err != nil {
-		fmt.Println("Задача не найдена1:", err)
+		fmt.Println("Задача не найдена:", err)
 		w.WriteHeader(http.StatusBadRequest)
-		answer, _ := json.Marshal(map[string]string{"error": "Задача не найдена"})
-		w.Write(answer)
+		w.Write(jsonError("Задача не найдена"))
 		return
 	}
 
@@ -32,16 +30,14 @@ func apiTaskDone(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("Ошибка удаления:", err)
 			w.WriteHeader(http.StatusBadRequest)
-			answer, _ := json.Marshal(map[string]string{"error": "Ошибка удаления"})
-			w.Write(answer)
+			w.Write(jsonError("Ошибка удаления"))
 			return
 		}
 	} else {
 		task.Date, err = NextDate(time.Now(), task.Date, task.Repeat)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			answer, _ := json.Marshal(map[string]string{"error": "Ошибка даты/повторения"})
-			w.Write(answer)
+			w.Write(jsonError("Ошибка даты/повторения"))
 			return
 		}
 		_, err = db.Exec("UPDATE scheduler SET date = :date WHERE id = :id",
@@ -50,8 +46,7 @@ func apiTaskDone(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			fmt.Println("Ошибка обновления задачи в БД:", err)
 			w.WriteHeader(http.StatusBadRequest)
-			answer, _ := json.Marshal(map[string]string{"error": "Ошибка обновления задачи в БД"})
-			w.Write(answer)
+			w.Write(jsonError("Ошибка обновления задачи в БД"))
 			return
 		}
 	}

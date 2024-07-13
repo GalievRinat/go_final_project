@@ -63,13 +63,6 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	db, err := sql.Open("sqlite", dbFile)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer db.Close()
-
 	res, err := db.Exec("UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id",
 		sql.Named("date", task.Date),
 		sql.Named("title", task.Title),

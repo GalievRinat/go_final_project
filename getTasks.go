@@ -1,20 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
 func apiGetTasks(w http.ResponseWriter, r *http.Request) {
-	db, err := sql.Open("sqlite", dbFile)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer db.Close()
-
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT 50")

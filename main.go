@@ -23,8 +23,9 @@ type Task struct {
 
 var dbFile string
 
-func main() {
+var db *sql.DB
 
+func main() {
 	err := gotdotenv.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -40,7 +41,7 @@ func main() {
 		fmt.Println("DB file not exist")
 	}
 
-	db, err := sql.Open("sqlite", dbFile)
+	db, err = sql.Open("sqlite", dbFile)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -70,9 +71,9 @@ func main() {
 	r.Post("/api/task/done", apiTaskDone)
 	r.Delete("/api/task", apiTaskDelete)
 
-	port := fmt.Sprintf(":%s", os.Getenv("TODO_PORT"))
-	fmt.Printf("Start web server on port [%s]\n", port)
-	if err := http.ListenAndServe(port, r); err != nil {
+	addr := fmt.Sprintf(":%s", os.Getenv("TODO_PORT"))
+	fmt.Printf("Start web server on port [%s]\n", addr)
+	if err := http.ListenAndServe(addr, r); err != nil {
 		fmt.Printf("Start server error: %s", err.Error())
 		return
 	}

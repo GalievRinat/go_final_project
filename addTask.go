@@ -62,13 +62,6 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	db, err := sql.Open("sqlite", dbFile)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	defer db.Close()
-
 	res, err := db.Exec("INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)",
 		sql.Named("date", task.Date),
 		sql.Named("title", task.Title),

@@ -10,7 +10,6 @@ import (
 
 func apiTaskDone(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("TaskDone")
-	//id := chi.URLParam(r, "id")
 	id := r.URL.Query().Get("id")
 	fmt.Println(id)
 
@@ -64,7 +63,6 @@ func apiTaskDone(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	//answer, _ := json.Marshal()
 	answer := []byte("{}")
 	fmt.Println(string(answer))
 	w.WriteHeader(http.StatusOK)

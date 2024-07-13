@@ -7,7 +7,6 @@ import (
 )
 
 func apiNextDate(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println(r.URL.Query().Get("now"))
 	now, err := time.Parse("20060102", r.URL.Query().Get("now"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

@@ -93,7 +93,6 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//answer, _ := json.Marshal(Task{})
 	answer := []byte("{}")
 	fmt.Println(string(answer))
 	w.WriteHeader(http.StatusOK)

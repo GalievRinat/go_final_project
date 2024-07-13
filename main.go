@@ -25,8 +25,6 @@ var dbFile string
 
 func main() {
 
-	//fmt.Println(NextDate(time.Now(), "20250701", "y"))
-
 	err := gotdotenv.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -59,10 +57,6 @@ func main() {
 	}
 
 	r := chi.NewRouter()
-	//r := http.NewServeMux()
-	//webDir := http.Dir("./web")
-	//webFs := http.FileServer(webDir)
-	//r.Handle("/", webFs)
 
 	workDir, _ := os.Getwd()
 	filesDir := http.Dir(filepath.Join(workDir, "web"))
@@ -76,10 +70,6 @@ func main() {
 	r.Post("/api/task/done", apiTaskDone)
 	r.Delete("/api/task", apiTaskDelete)
 
-	//r.Get("/tasks", handlers.GetTasks)
-	//r.Post("/tasks", handlers.PostTask)
-	//r.Get("/tasks/{id}", handlers.GetTaskByID)
-	//r.Delete("/tasks/{id}", handlers.DeleteTask)
 	port := fmt.Sprintf(":%s", os.Getenv("TODO_PORT"))
 	fmt.Printf("Start web server on port [%s]\n", port)
 	if err := http.ListenAndServe(port, r); err != nil {

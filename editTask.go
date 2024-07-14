@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/GalievRinat/go_final_project/model"
 )
 
 func apiEditTask(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("EditTask")
-	var task Task
+	var task model.Task
 	var buf bytes.Buffer
 
 	_, err := buf.ReadFrom(r.Body)

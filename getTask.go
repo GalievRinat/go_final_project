@@ -12,7 +12,7 @@ func apiGetTask(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	task, err := taskRepo.getbyID(id)
+	task, err := taskRepo.GetbyID(id)
 	if err != nil {
 		fmt.Println(err)
 		jsonError(w, "Задача не найдена", err)

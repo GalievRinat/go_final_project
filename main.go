@@ -6,20 +6,13 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/GalievRinat/go_final_project/task_repository"
 	"github.com/go-chi/chi/v5"
 	gotdotenv "github.com/joho/godotenv"
 	_ "modernc.org/sqlite"
 )
 
-type Task struct {
-	ID      string `json:"id"`
-	Date    string `json:"date"`
-	Title   string `json:"title"`
-	Comment string `json:"comment"`
-	Repeat  string `json:"repeat"`
-}
-
-var taskRepo TaskRepository
+var taskRepo task_repository.TaskRepository
 
 func main() {
 	err := gotdotenv.Load()
@@ -28,12 +21,12 @@ func main() {
 	}
 
 	dbFile := os.Getenv("TODO_DBFILE")
-	err = taskRepo.createRepo(dbFile)
+	err = taskRepo.CreateRepo(dbFile)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer taskRepo.db.Close()
+	defer taskRepo.DB.Close()
 
 	r := chi.NewRouter()
 

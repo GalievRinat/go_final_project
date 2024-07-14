@@ -35,19 +35,19 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if task.Date == "" {
-		task.Date = Now.Format("20060102")
+		task.Date = Now.Format(dateFormat)
 	}
 
-	_, err = time.Parse("20060102", task.Date)
+	_, err = time.Parse(dateFormat, task.Date)
 
 	if err != nil {
 		jsonError(w, "Ошибка: неверный формат даты", err)
 		return
 	}
 
-	if Now.Format("20060102") > task.Date {
+	if Now.Format(dateFormat) > task.Date {
 		if task.Repeat == "" {
-			task.Date = Now.Format("20060102")
+			task.Date = Now.Format(dateFormat)
 		} else {
 			task.Date, err = NextDate(Now, task.Date, task.Repeat)
 			if err != nil {

@@ -14,6 +14,8 @@ import (
 
 var taskRepo task_repository.TaskRepository
 
+const dateFormat = "20060102"
+
 func main() {
 	err := gotdotenv.Load()
 	if err != nil {

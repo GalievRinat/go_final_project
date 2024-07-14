@@ -3,14 +3,42 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
-func jsonError(text string) []byte {
-	answer, err := json.Marshal(map[string]string{"error": text})
+func jsonError(w http.ResponseWriter, text string, err error) {
+	text_error := fmt.Sprintf("%s [%s]", text, err)
+	fmt.Println(text_error)
+
+	json_text, err := json.Marshal(map[string]string{"error": text_error})
 	if err != nil {
-		fmt.Println("Ошибка генерации JSON для ошибки:", err)
-		return []byte("")
+		fmt.Println("Ошибка генерации JSON для jsonError:", err)
+		return
 	}
-	fmt.Println("Ошибка:", text)
-	return answer
+
+	_, err = w.Write(json_text)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
+	return
+}
+
+func jsonEmpty(w http.ResponseWriter, text string, err error) {
+	text_error := fmt.Sprintf("%s [%s]", text, err)
+	fmt.Println(text_error)
+
+	json_text, err := json.Marshal(map[string]string{"error": text_error})
+	if err != nil {
+		fmt.Println("Ошибка генерации JSON для jsonError:", err)
+		return
+	}
+
+	w.WriteHeader(http.StatusBadRequest)
+	_, err = w.Write(json_text)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
+	return
 }

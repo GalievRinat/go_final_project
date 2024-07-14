@@ -15,18 +15,20 @@ func apiGetTask(w http.ResponseWriter, r *http.Request) {
 	task, err := taskRepo.getbyID(id)
 	if err != nil {
 		fmt.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Задача не найдена"))
+		jsonError(w, "Задача не найдена", err)
 		return
 	}
 
 	resp, err := json.Marshal(task)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка сериализации JSON"))
+		jsonError(w, "Ошибка сериализации JSON", err)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, err = w.Write(resp)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
 }

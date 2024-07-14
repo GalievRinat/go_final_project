@@ -11,24 +11,25 @@ func apiGetTasks(w http.ResponseWriter, r *http.Request) {
 
 	tasks, err := taskRepo.getAll()
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка получения списка задач"))
+		jsonError(w, "Ошибка получения списка задач", err)
 		return
 	}
 
 	fmt.Println(tasks)
 	if tasks == nil {
-		w.WriteHeader(http.StatusBadRequest)
 		tasks = make([]Task, 0)
 	}
-	resp, err := json.Marshal(map[string][]Task{"tasks": tasks})
 
+	resp, err := json.Marshal(map[string][]Task{"tasks": tasks})
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка сериализации JSON"))
+		jsonError(w, "Ошибка сериализации JSON", err)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, err = w.Write(resp)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
 }

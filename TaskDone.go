@@ -15,35 +15,34 @@ func apiTaskDone(w http.ResponseWriter, r *http.Request) {
 
 	task, err := taskRepo.getbyID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Задача не найдена"))
+		jsonError(w, "Задача не найдена", err)
 		return
 	}
 
 	if task.Repeat == "" {
 		err = taskRepo.Delete(task)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write(jsonError("Ошибка удаления"))
+			jsonError(w, "Ошибка удаления", err)
 			return
 		}
 	} else {
 		task.Date, err = NextDate(time.Now(), task.Date, task.Repeat)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write(jsonError("Ошибка даты/повторения"))
+			jsonError(w, "Ошибка даты/повторения", err)
 			return
 		}
 		_, err = taskRepo.Edit(task)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write(jsonError("Ошибка обновления задачи в БД"))
+			jsonError(w, "Ошибка обновления задачи в БД", err)
 			return
 		}
 	}
 
-	answer := []byte("{}")
-	fmt.Println(string(answer))
+	resp := []byte("{}")
 	w.WriteHeader(http.StatusOK)
-	w.Write(answer)
+	_, err = w.Write(resp)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
 }

@@ -28,8 +28,7 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	if task.Title == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка: пустой заголовок"))
+		jsonError(w, "Ошибка: пустой заголовок", err)
 		return
 	}
 
@@ -40,8 +39,7 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 	_, err = time.Parse("20060102", task.Date)
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка: неверный формат даты"))
+		jsonError(w, "Ошибка: неверный формат даты", err)
 		return
 	}
 
@@ -51,8 +49,7 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 		} else {
 			task.Date, err = NextDate(Now, task.Date, task.Repeat)
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				w.Write(jsonError("Ошибка даты/повторения"))
+				jsonError(w, "Ошибка даты/повторения", err)
 				return
 			}
 		}
@@ -61,14 +58,12 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 	res, err := taskRepo.Add(task)
 	if err != nil {
 		fmt.Println(err)
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка добавления задачи в БД"))
+		jsonError(w, "Ошибка добавления задачи в БД", err)
 		return
 	}
 	id, err := res.LastInsertId()
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка получения ID добавленной задачи"))
+		jsonError(w, "Ошибка получения ID добавленной задачи", err)
 		return
 	}
 
@@ -79,5 +74,9 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(answer)
+	_, err = w.Write(answer)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
 }

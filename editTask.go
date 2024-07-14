@@ -30,7 +30,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 
 	if task.Title == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка: пустой заголовок"))
+		jsonError(w, "Ошибка: пустой заголовок", err)
 		return
 	}
 
@@ -42,7 +42,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка: неверный формат даты"))
+		jsonError(w, "Ошибка: неверный формат даты", err)
 		return
 	}
 
@@ -53,7 +53,7 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 			task.Date, err = NextDate(Now, task.Date, task.Repeat)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
-				w.Write(jsonError("Ошибка даты/повторения"))
+				jsonError(w, "Ошибка даты/повторения", err)
 				return
 			}
 		}
@@ -62,20 +62,22 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 	res, err := taskRepo.Edit(task)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка обновления задачи в БД"))
+		jsonError(w, "Ошибка обновления задачи в БД", err)
 		return
 	}
 
 	row_count, _ := res.RowsAffected()
 	if row_count == 0 {
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonError("Задача не найдена"))
+		jsonError(w, "Задача не найдена", err)
+		//w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	answer := []byte("{}")
-	fmt.Println(string(answer))
+	resp := []byte("{}")
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Write(answer)
+	_, err = w.Write(resp)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
 }

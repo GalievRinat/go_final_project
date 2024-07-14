@@ -14,20 +14,21 @@ func apiTaskDelete(w http.ResponseWriter, r *http.Request) {
 
 	task, err := taskRepo.getbyID(id)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Задача не найдена"))
+		jsonError(w, "Задача не найдена", err)
 		return
 	}
 
 	err = taskRepo.Delete(task)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка удаления"))
+		jsonError(w, "Ошибка удаления", err)
 		return
 	}
 
-	answer := []byte("{}")
-	fmt.Println(string(answer))
+	resp := []byte("{}")
 	w.WriteHeader(http.StatusOK)
-	w.Write(answer)
+	_, err = w.Write(resp)
+	if err != nil {
+		fmt.Println("Ошибка записи данных в соединение:", err)
+		return
+	}
 }

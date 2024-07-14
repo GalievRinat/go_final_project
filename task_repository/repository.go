@@ -66,6 +66,10 @@ func (taskRepo *TaskRepository) GetAll() ([]model.Task, error) {
 		}
 		tasks = append(tasks, task)
 	}
+	if rows.Err() != nil {
+		fmt.Println(rows.Err())
+		return []model.Task{}, rows.Err()
+	}
 	return tasks, err
 }
 

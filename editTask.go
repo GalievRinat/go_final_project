@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -60,14 +59,8 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	res, err := db.Exec("UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id",
-		sql.Named("date", task.Date),
-		sql.Named("title", task.Title),
-		sql.Named("comment", task.Comment),
-		sql.Named("repeat", task.Repeat),
-		sql.Named("id", task.ID))
+	res, err := taskRepo.Edit(task)
 	if err != nil {
-		fmt.Println("Ошибка обновления задачи в БД:", err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(jsonError("Ошибка обновления задачи в БД"))
 		return
@@ -75,7 +68,6 @@ func apiEditTask(w http.ResponseWriter, r *http.Request) {
 
 	row_count, _ := res.RowsAffected()
 	if row_count == 0 {
-		fmt.Println("Задача не найдена:", task.ID)
 		w.WriteHeader(http.StatusOK)
 		w.Write(jsonError("Задача не найдена"))
 		return

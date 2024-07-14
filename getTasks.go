@@ -9,27 +9,11 @@ import (
 func apiGetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	rows, err := db.Query("SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date LIMIT 50")
+	tasks, err := taskRepo.getAll()
 	if err != nil {
-		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write(jsonError("Ошибка чтения из БД"))
+		w.Write(jsonError("Ошибка получения списка задач"))
 		return
-	}
-	defer rows.Close()
-	var tasks []Task
-	for rows.Next() {
-		var task Task
-
-		err := rows.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
-		if err != nil {
-			fmt.Println(err)
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write(jsonError("Ошибка парсинга строк БД"))
-			return
-		}
-
-		tasks = append(tasks, task)
 	}
 
 	fmt.Println(tasks)

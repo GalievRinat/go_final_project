@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -59,23 +58,23 @@ func apiAddTask(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	res, err := db.Exec("INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)",
-		sql.Named("date", task.Date),
-		sql.Named("title", task.Title),
-		sql.Named("comment", task.Comment),
-		sql.Named("repeat", task.Repeat))
+	res, err := taskRepo.Add(task)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(jsonError("Ошибка добавления задачи в БД"))
 		return
 	}
-
-	id, _ := res.LastInsertId()
+	id, err := res.LastInsertId()
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(jsonError("Ошибка получения ID добавленной задачи"))
+		return
+	}
 
 	answer, err := json.Marshal(map[string]int64{"id": id})
 	if err != nil {
-		fmt.Println("Ошибка генерации JSON для ошибки:", err)
+		fmt.Println("Ошибка генерации JSON для ID:", err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

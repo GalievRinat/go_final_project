@@ -1,9 +1,7 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -21,41 +19,21 @@ type Task struct {
 	Repeat  string `json:"repeat"`
 }
 
-var dbFile string
-
-var db *sql.DB
+var taskRepo TaskRepository
 
 func main() {
 	err := gotdotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
-	dbFile = os.Getenv("TODO_DBFILE")
-	fmt.Printf("DB on file [%s]\n", dbFile)
-	_, err = os.Stat(dbFile)
-
-	var install bool
-	if err != nil {
-		install = true
-		fmt.Println("DB file not exist")
-	}
-
-	db, err = sql.Open("sqlite", dbFile)
+	dbFile := os.Getenv("TODO_DBFILE")
+	err = taskRepo.createRepo(dbFile)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	defer db.Close()
-
-	if install {
-		fmt.Println("Create DB table")
-		_, err := db.Exec("CREATE TABLE scheduler ( id INTEGER PRIMARY KEY AUTOINCREMENT, date VARCHAR (8), title VARCHAR(255), comment TEXT, repeat VARCHAR(128))")
-
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	defer taskRepo.db.Close()
 
 	r := chi.NewRouter()
 

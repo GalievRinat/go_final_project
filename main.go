@@ -12,8 +12,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-var taskRepo task_repository.TaskRepository
-
 const dateFormat = "20060102"
 
 func main() {
@@ -23,6 +21,7 @@ func main() {
 	}
 
 	dbFile := os.Getenv("TODO_DBFILE")
+	taskRepo := task_repository.TaskRepository{}
 	err = taskRepo.CreateRepo(dbFile)
 	if err != nil {
 		fmt.Println(err)
@@ -36,13 +35,13 @@ func main() {
 	filesDir := http.Dir(filepath.Join(workDir, "web"))
 	FileServer(r, "/", filesDir)
 
-	r.Get("/api/nextdate", apiNextDate)
-	r.Post("/api/task", apiAddTask)
-	r.Get("/api/tasks", apiGetTasks)
-	r.Get("/api/task", apiGetTask)
-	r.Put("/api/task", apiEditTask)
-	r.Post("/api/task/done", apiTaskDone)
-	r.Delete("/api/task", apiTaskDelete)
+	r.Get("/api/nextdate", apiNextDate(&taskRepo))
+	r.Post("/api/task", apiAddTask(&taskRepo))
+	r.Get("/api/tasks", apiGetTasks(&taskRepo))
+	r.Get("/api/task", apiGetTask(&taskRepo))
+	r.Put("/api/task", apiEditTask(&taskRepo))
+	r.Post("/api/task/done", apiTaskDone(&taskRepo))
+	r.Delete("/api/task", apiTaskDelete(&taskRepo))
 
 	addr := fmt.Sprintf(":%s", os.Getenv("TODO_PORT"))
 	fmt.Printf("Start web server on port [%s]\n", addr)

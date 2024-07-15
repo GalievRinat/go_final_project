@@ -59,15 +59,10 @@ func (handler *Handler) ApiAddTask(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	res, err := handler.taskRepo.Add(task)
+	id, err := handler.taskRepo.Add(task)
 	if err != nil {
 		fmt.Println(err)
 		jsonError(w, "Ошибка добавления задачи в БД", err)
-		return
-	}
-	id, err := res.LastInsertId()
-	if err != nil {
-		jsonError(w, "Ошибка получения ID добавленной задачи", err)
 		return
 	}
 

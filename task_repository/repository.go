@@ -94,13 +94,13 @@ func (taskRepo *TaskRepository) Edit(task model.Task) (int64, error) {
 	return row_count, err
 }
 
-func (taskRepo *TaskRepository) Add(task model.Task) (sql.Result, error) {
+func (taskRepo *TaskRepository) Add(task model.Task) (int64, error) {
 	fmt.Println("Добавление задачи", task.Title)
 	res, err := taskRepo.DB.Exec("INSERT INTO scheduler (date, title, comment, repeat) VALUES (:date, :title, :comment, :repeat)",
 		sql.Named("date", task.Date),
 		sql.Named("title", task.Title),
 		sql.Named("comment", task.Comment),
 		sql.Named("repeat", task.Repeat))
-
-	return res, err
+	id, err := res.LastInsertId()
+	return id, err
 }

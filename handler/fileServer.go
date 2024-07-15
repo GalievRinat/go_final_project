@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"net/http"
@@ -7,13 +7,13 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func FileServer(r chi.Router, path string, root http.FileSystem) {
+func (handler *Handler) FileServer(r chi.Router, path string, root http.FileSystem) {
 	if strings.ContainsAny(path, "{}*") {
 		panic("FileServer does not permit any URL parameters.")
 	}
 
 	if path != "/" && path[len(path)-1] != '/' {
-		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+		r.Get(path, http.RedirectHandler(path+"/", http.StatusMovedPermanently).ServeHTTP)
 		path += "/"
 	}
 	path += "*"

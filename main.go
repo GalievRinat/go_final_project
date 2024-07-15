@@ -6,13 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/GalievRinat/go_final_project/task_repository"
+	"github.com/GalievRinat/go_final_project/handler"
 	"github.com/go-chi/chi/v5"
 	gotdotenv "github.com/joho/godotenv"
 	_ "modernc.org/sqlite"
 )
-
-const dateFormat = "20060102"
 
 func main() {
 	err := gotdotenv.Load()
@@ -20,28 +18,33 @@ func main() {
 		fmt.Println(err)
 	}
 
+	handler := handler.Handler{}
 	dbFile := os.Getenv("TODO_DBFILE")
-	taskRepo := task_repository.TaskRepository{}
-	err = taskRepo.CreateRepo(dbFile)
+	err = handler.CreateHandler(dbFile)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Ошибка создания handler: ", err)
 		return
 	}
-	defer taskRepo.DB.Close()
+	defer handler.CloseHandler()
 
 	r := chi.NewRouter()
 
-	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "web"))
-	FileServer(r, "/", filesDir)
+	workDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Ошибка обнаружения рабочей директории: ", err)
+		return
+	}
 
-	r.Get("/api/nextdate", apiNextDate(&taskRepo))
-	r.Post("/api/task", apiAddTask(&taskRepo))
-	r.Get("/api/tasks", apiGetTasks(&taskRepo))
-	r.Get("/api/task", apiGetTask(&taskRepo))
-	r.Put("/api/task", apiEditTask(&taskRepo))
-	r.Post("/api/task/done", apiTaskDone(&taskRepo))
-	r.Delete("/api/task", apiTaskDelete(&taskRepo))
+	filesDir := http.Dir(filepath.Join(workDir, "web"))
+	handler.FileServer(r, "/", filesDir)
+
+	r.Get("/api/nextdate", handler.ApiNextDate)
+	r.Post("/api/task", handler.ApiAddTask)
+	r.Get("/api/tasks", handler.ApiGetTasks)
+	r.Get("/api/task", handler.ApiGetTask)
+	r.Put("/api/task", handler.ApiEditTask)
+	r.Post("/api/task/done", handler.ApiTaskDone)
+	r.Delete("/api/task", handler.ApiTaskDelete)
 
 	addr := fmt.Sprintf(":%s", os.Getenv("TODO_PORT"))
 	fmt.Printf("Start web server on port [%s]\n", addr)

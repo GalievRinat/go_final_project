@@ -45,7 +45,11 @@ func (taskRepo *TaskRepository) GetbyID(taskID string) (model.Task, error) {
 	var task model.Task
 	row := taskRepo.DB.QueryRow("SELECT id, date, title, comment, repeat FROM scheduler WHERE id = :id", sql.Named("id", taskID))
 	err := row.Scan(&task.ID, &task.Date, &task.Title, &task.Comment, &task.Repeat)
-	return task, err
+	if err != nil {
+		fmt.Println(err)
+		return model.Task{}, err
+	}
+	return task, nil
 }
 
 func (taskRepo *TaskRepository) GetAll() ([]model.Task, error) {
@@ -67,10 +71,9 @@ func (taskRepo *TaskRepository) GetAll() ([]model.Task, error) {
 		tasks = append(tasks, task)
 	}
 	if rows.Err() != nil {
-		fmt.Println(rows.Err())
 		return []model.Task{}, rows.Err()
 	}
-	return tasks, err
+	return tasks, nil
 }
 
 func (taskRepo *TaskRepository) Delete(task model.Task) error {
@@ -79,7 +82,7 @@ func (taskRepo *TaskRepository) Delete(task model.Task) error {
 	return err
 }
 
-func (taskRepo *TaskRepository) Edit(task model.Task) (sql.Result, error) {
+func (taskRepo *TaskRepository) Edit(task model.Task) (int64, error) {
 	fmt.Println("Изменение задачи", task.ID)
 	res, err := taskRepo.DB.Exec("UPDATE scheduler SET date = :date, title = :title, comment = :comment, repeat = :repeat WHERE id = :id",
 		sql.Named("date", task.Date),
@@ -87,7 +90,8 @@ func (taskRepo *TaskRepository) Edit(task model.Task) (sql.Result, error) {
 		sql.Named("comment", task.Comment),
 		sql.Named("repeat", task.Repeat),
 		sql.Named("id", task.ID))
-	return res, err
+	row_count, _ := res.RowsAffected()
+	return row_count, err
 }
 
 func (taskRepo *TaskRepository) Add(task model.Task) (sql.Result, error) {
@@ -97,5 +101,6 @@ func (taskRepo *TaskRepository) Add(task model.Task) (sql.Result, error) {
 		sql.Named("title", task.Title),
 		sql.Named("comment", task.Comment),
 		sql.Named("repeat", task.Repeat))
+
 	return res, err
 }

@@ -68,6 +68,7 @@ func (handler *Handler) ApiAddTask(w http.ResponseWriter, r *http.Request) {
 
 	answer, err := json.Marshal(map[string]int64{"id": id})
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Println("Ошибка генерации JSON для ID:", err)
 		return
 	}

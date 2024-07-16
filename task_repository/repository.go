@@ -90,7 +90,13 @@ func (taskRepo *TaskRepository) Edit(task model.Task) (int64, error) {
 		sql.Named("comment", task.Comment),
 		sql.Named("repeat", task.Repeat),
 		sql.Named("id", task.ID))
-	row_count, _ := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	row_count, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
 	return row_count, err
 }
 
@@ -101,6 +107,12 @@ func (taskRepo *TaskRepository) Add(task model.Task) (int64, error) {
 		sql.Named("title", task.Title),
 		sql.Named("comment", task.Comment),
 		sql.Named("repeat", task.Repeat))
+	if err != nil {
+		return 0, err
+	}
 	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
 	return id, err
 }

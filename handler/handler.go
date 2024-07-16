@@ -10,10 +10,11 @@ type Handler struct {
 	taskRepo *task_repository.TaskRepository
 }
 
-func (handler *Handler) CreateHandler(dbFile string) error {
+func NewHandler(dbFile string) (*Handler, error) {
+	handler := Handler{}
 	handler.taskRepo = &task_repository.TaskRepository{}
 	err := handler.taskRepo.CreateRepo(dbFile)
-	return err
+	return &handler, err
 }
 
 func (handler *Handler) CloseHandler() {

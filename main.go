@@ -18,9 +18,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	handler := handler.Handler{}
 	dbFile := os.Getenv("TODO_DBFILE")
-	err = handler.CreateHandler(dbFile)
+	handler, err := handler.NewHandler(dbFile)
 	if err != nil {
 		fmt.Println("Ошибка создания handler: ", err)
 		return
